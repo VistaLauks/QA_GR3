@@ -1,0 +1,15 @@
+javascript
+// Проверка ID
+$('#user-name')              // поле username
+$('#password')               // поле password
+$('#login-button')           // кнопка Login
+
+// Уникальность
+$$('#user-name').length      // должно быть 1
+
+// Проверка классов
+$$('.inventory_item').length  // сколько товаров (после логина)
+
+// XPath
+$x("//button[text()='Add to cart']")  // все кнопки добавления
+$x("//div[text()='Sauce Labs Backpack']")  // товар по названию
