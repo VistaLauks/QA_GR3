@@ -63,7 +63,7 @@ if __name__ == "__main__":
     print("===== ТЕСТИРОВАНИЕ API =====")
     demo_get_posts()
     demo_get_single_post(1)
-    demo_get_single_post(999)
+    demo_get_single_post(98)
     demo_create_post()
     demo_update_post()
     demo_delete_post()
