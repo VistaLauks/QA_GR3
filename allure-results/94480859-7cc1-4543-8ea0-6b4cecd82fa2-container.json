@@ -1,0 +1,1 @@
+{"uuid": "baaacd76-227b-43aa-bdbe-a6e83ce4f877", "befores": [{"name": "booking_id", "status": "passed", "start": 1792578703494, "stop": 1792578703494}], "afters": [{"name": "booking_id::<lambda>", "start": 1792578704066}], "start": 1792578703494, "stop": 1792578704066}

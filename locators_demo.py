@@ -6,6 +6,7 @@ import time
 
 def demo_login():
     # Запуск драйвера
+    #driver = webdriver.
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
     driver.maximize_window()
     driver.get("https://www.saucedemo.com/")
@@ -13,6 +14,7 @@ def demo_login():
     print("\n===== ЛОКАТОРЫ НА SAUCEDEMO =====")
 
     # 1. По ID — поле username
+    #username = driver.
     username = driver.find_element(By.ID, "user-name")
     username.send_keys("standard_user")
     print("✅ По ID: поле username найдено")
