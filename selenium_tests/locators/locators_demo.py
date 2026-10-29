@@ -5,6 +5,33 @@ from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.options import Options
 import time
 
+# Локаторы для формы входа задание 8
+LOGIN_INPUT = (By.CSS_SELECTOR, "#user-name")
+PASSWORD_INPUT = (By.CSS_SELECTOR, "#password")
+SUBMIT_BUTTON = (By.CSS_SELECTOR, "#login-button")
+
+#Локаторы для оформления покупки задание 8 (Часть 1)
+SUBMIT_BUTTON_PRODUCT = (By.CSS_SELECTOR, "#add-to-cart-sauce-labs-backpack")
+CHECK_OUT = (By.CSS_SELECTOR, "#checkout")
+FIRST_NAME = (By.CSS_SELECTOR, "#first-name")
+LAST_NAME = (By.CSS_SELECTOR, "#last-name")
+POSTAL_CODE = (By.CSS_SELECTOR, "#postal-code")
+CONTINUE_BUTTON = (By.CSS_SELECTOR, "#continue")
+FINISH_BUTTON = (By.CSS_SELECTOR, "#finish")
+COMPLETE_OUTPUT = (By.CSS_SELECTOR, "#checkout_complete_container > h2")
+
+#Локаторы для оформления покупки задание 8 (Часть 2)
+SUBMIT_BUTTON_PRODUCT2 = (By.CSS_SELECTOR, "#add-to-cart-sauce-labs-bolt-t-shirt")
+REMOVE_BUTTON1 = (By.CSS_SELECTOR, "#remove-sauce-labs-backpack")
+REMOVE_BUTTON2 = (By.CSS_SELECTOR, "#remove-sauce-labs-bolt-t-shirt")
+CLEAR_SHOP = (By.CSS_SELECTOR, "#shopping_cart_container > a")
+
+
+# Локаторы для сообщений об ошибках и элементов после входа задание 8 (Часть 3)
+ERROR_MESSAGE = (By.CSS_SELECTOR, "#login_button_container > div > form > div.error-message-container.error > h3")
+USER_PROFILE = (By.CSS_SELECTOR, "#shopping_cart_container > a")
+
+
 def demo_login():
     # Запуск драйвера, чтобы страница загрузилась в режиме "Инконгито - это необходимо для защиты от уведомления Гугл, что ваш пароль раскрыт"
     chrome_options = Options()
@@ -74,6 +101,7 @@ def demo_login():
     # Небольшая пауза, чтобы увидеть результат
     time.sleep(3)
     driver.quit()
+
 
 if __name__ == "__main__":
     demo_login()
