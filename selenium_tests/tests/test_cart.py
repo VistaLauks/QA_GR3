@@ -1,4 +1,6 @@
 import pytest
+import allure
+from allure_commons.types import Severity
 import time
 from selenium.common import TimeoutException
 from selenium.webdriver.support import expected_conditions as EC
@@ -21,38 +23,40 @@ from locators.locators_demo import (
     CLEAR_SHOP,
 )
 
-# Сценарии тестов
+
+@allure.step("Логинимся и добавляем товары в корзину: логин = '{login}'")
 def fill_login_form(driver, wait, login, password):
     """Заполняем форму входа с использованием локаторов"""
-    login_field = wait.until(EC.visibility_of_element_located(LOGIN_INPUT))
-    login_field.clear()
-    login_field.send_keys(login)
+    with allure.step("Заполняем форму входа"):
+        login_field = wait.until(EC.element_to_be_clickable(LOGIN_INPUT))
+        login_field.clear()
+        login_field.send_keys(login)
 
-    password_field = driver.find_element(*PASSWORD_INPUT)
-    password_field.clear()
-    password_field.send_keys(password)
+        password_field = wait.until(EC.element_to_be_clickable(PASSWORD_INPUT))
+        password_field.clear()
+        password_field.send_keys(password)
 
-    submit_btn = driver.find_element(*SUBMIT_BUTTON)
-    submit_btn.click()
+        wait.until(EC.element_to_be_clickable(SUBMIT_BUTTON)).click()
 
-    submit_btn_product = driver.find_element(*SUBMIT_BUTTON_PRODUCT)
-    submit_btn_product.click()
+    with allure.step("Добавляем товары в корзину"):
+        wait.until(EC.element_to_be_clickable(SUBMIT_BUTTON_PRODUCT)).click()
+        wait.until(EC.element_to_be_clickable(SUBMIT_BUTTON_PRODUCT2)).click()
 
-    submit_btn_product2 = driver.find_element(*SUBMIT_BUTTON_PRODUCT2)
-    submit_btn_product2.click()
+    with allure.step("Переходим в корзину"):
+        wait.until(EC.element_to_be_clickable(USER_PROFILE)).click()
 
-    submit_btn_profile = driver.find_element(*USER_PROFILE)
-    submit_btn_profile.click()
+    with allure.step("Удаляем товары из корзины"):
+        wait.until(EC.element_to_be_clickable(REMOVE_BUTTON1)).click()
+        wait.until(EC.element_to_be_clickable(REMOVE_BUTTON2)).click()
 
-    remove_btn1 = driver.find_element(*REMOVE_BUTTON1)
-    remove_btn1.click()
+        time.sleep(2)
 
-    remove_btn2 = driver.find_element(*REMOVE_BUTTON2)
-    remove_btn2.click()
-
-    time.sleep(2)
-
-
+@pytest.mark.xfail(reason="Баг: после удаления товаров пользователь остаётся в корзине, а не возвращается на страницу товаров")
+@allure.suite("Корзина")                                  # название тест-сьюта
+@allure.title("Очистка корзины после удаления товаров")   # название теста
+@allure.label("feature", "Корзина")
+@allure.label("owner", "Roman Zelenokhat")
+@allure.severity(Severity.CRITICAL)
 # --- Тесты ---
 @pytest.mark.parametrize(
     "login, password",
@@ -63,18 +67,24 @@ def fill_login_form(driver, wait, login, password):
         "valid_credentials"
     ]
 )
-# Прогоняем тесты с полученными параметрами на Веб-интерфейсе, разделяяя их на положительный и отрицательные
+# Прогоняем тесты с полученными параметрами на веб-интерфейсе
 def test_login(driver, wait, login, password):
-    driver.get("https://www.saucedemo.com/")  # URL адреса сайта
-    fill_login_form(driver, wait, login, password)
+    with allure.step("Открываем страницу авторизации"):
+        driver.get("https://www.saucedemo.com/")  # URL адреса сайта
 
-    #Тест на очищенную корзину
-    wait.until(EC.visibility_of_element_located(CLEAR_SHOP))
-    #Тест на нахождение пользователя на странице выбора товаров (Должен упасть с ошибкой) selenium_tests\tests\cart.py:97:
-    try:
-        submit_button = wait.until(EC.visibility_of_element_located(SUBMIT_BUTTON_PRODUCT))
-    except TimeoutException:
-        assert False, "Пользователь не на странице выбора товаров"
+    with allure.step("Выполняем сценарий: логин, добавление и удаление товаров"):
+        fill_login_form(driver, wait, login, password)
+
+    # Тест на очищенную корзину
+    with allure.step("Проверяем, что корзина пуста"):
+        wait.until(EC.visibility_of_element_located(CLEAR_SHOP))
+
+    # Тест на нахождение пользователя на странице выбора товаров (должен упасть с ошибкой)
+    with allure.step("Проверяем, что пользователь вернулся на страницу выбора товаров"):
+        try:
+            wait.until(EC.visibility_of_element_located(SUBMIT_BUTTON_PRODUCT))
+        except TimeoutException:
+            assert False, "Пользователь не на странице выбора товаров"
 
 
 

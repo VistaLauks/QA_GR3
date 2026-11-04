@@ -1,4 +1,6 @@
 import pytest
+import allure
+from allure_commons.types import Severity
 import time
 from selenium.webdriver.support import expected_conditions as EC
 import sys
@@ -22,67 +24,69 @@ from locators.locators_demo import (
     COMPLETE_OUTPUT,
 )
 
-# Сценарии тестов
-def fill_login_form(driver, wait, login, password, firstname,lastname, postalcode):
-    """Заполняем форму входа с использованием локаторов"""
-    login_field = wait.until(EC.visibility_of_element_located(LOGIN_INPUT))
-    login_field.clear()
-    login_field.send_keys(login)
 
-    password_field = driver.find_element(*PASSWORD_INPUT)
-    password_field.clear()
-    password_field.send_keys(password)
+@allure.step("Сценарий покупки: логин = '{login}', покупатель = {firstname} {lastname}")
+def fill_login_form(driver, wait, login, password, firstname, lastname, postalcode):
+    with allure.step("Заполняем форму входа"):
+        login_field = wait.until(EC.element_to_be_clickable(LOGIN_INPUT))
+        login_field.clear()
+        login_field.send_keys(login)
 
-    submit_btn = driver.find_element(*SUBMIT_BUTTON)
-    submit_btn.click()
+        password_field = wait.until(EC.element_to_be_clickable(PASSWORD_INPUT))
+        password_field.clear()
+        password_field.send_keys(password)
 
-    submit_btn_product = driver.find_element(*SUBMIT_BUTTON_PRODUCT)
-    submit_btn_product.click()
+        wait.until(EC.element_to_be_clickable(SUBMIT_BUTTON)).click()
 
-    submit_btn_profile = driver.find_element(*USER_PROFILE)
-    submit_btn_profile.click()
+    with allure.step("Добавляем товар в корзину и переходим в корзину"):
+        wait.until(EC.element_to_be_clickable(SUBMIT_BUTTON_PRODUCT)).click()
+        wait.until(EC.element_to_be_clickable(USER_PROFILE)).click()
 
-    submit_btn_checkout = driver.find_element(*CHECK_OUT)
-    submit_btn_checkout.click()
+    with allure.step("Нажимаем Checkout и заполняем данные покупателя"):
+        wait.until(EC.element_to_be_clickable(CHECK_OUT)).click()
 
-    firstname_field = driver.find_element(*FIRST_NAME)
-    firstname_field.clear()
-    firstname_field.send_keys(firstname)
+        firstname_field = wait.until(EC.element_to_be_clickable(FIRST_NAME))
+        firstname_field.clear()
+        firstname_field.send_keys(firstname)
 
-    lastname_field = wait.until(EC.visibility_of_element_located(LAST_NAME))
-    lastname_field.clear()
-    lastname_field.send_keys(lastname)
+        lastname_field = wait.until(EC.element_to_be_clickable(LAST_NAME))
+        lastname_field.clear()
+        lastname_field.send_keys(lastname)
 
-    postalcode_field = driver.find_element(*POSTAL_CODE)
-    postalcode_field.clear()
-    postalcode_field.send_keys(postalcode)
-    
-    submit_btn_continue = driver.find_element(*CONTINUE_BUTTON)
-    submit_btn_continue.click()
-    
-    submit_btn_finish = driver.find_element(*FINISH_BUTTON)
-    submit_btn_finish.click()
-    time.sleep(2)
+        postalcode_field = wait.until(EC.element_to_be_clickable(POSTAL_CODE))
+        postalcode_field.clear()
+        postalcode_field.send_keys(postalcode)
 
+        wait.until(EC.element_to_be_clickable(CONTINUE_BUTTON)).click()
+
+    with allure.step("Завершаем покупку (Finish)"):
+        wait.until(EC.element_to_be_clickable(FINISH_BUTTON)).click()
+        time.sleep(2)
+
+
+@allure.suite("Оформление заказа")                          # название тест-сьюта
+@allure.title("Успешная покупка товара")                    # название теста
+@allure.label("feature", "Checkout")
+@allure.label("owner", "Roman Zelenokhat")
+@allure.severity(Severity.BLOCKER)
 # --- Тесты ---
 @pytest.mark.parametrize(
     "login,password, firstname, lastname, postalcode",
     [
-        ("standard_user", "secret_sauce", "roman", "zelenokhat", "123"),      # Успешная авторизация, покупка 1 товара, успешное заполнение формы
+        ("standard_user", "secret_sauce", "roman", "zelenokhat", "123"),  # Успешная покупка товара
     ],
     ids=[
         "valid_credentials"
     ]
 )
-
-#Прогоняем тесты с полученными параметрами на Веб-интерфейсе, разделяяя их на положительный и отрицательные
+# Прогоняем тесты с полученными параметрами на веб-интерфейсе
 def test_login(driver, wait, login, password, firstname, lastname, postalcode):
-    driver.get("https://www.saucedemo.com/")  # URL адреса сайта
-    fill_login_form(driver, wait, login, password, firstname, lastname, postalcode)
+    with allure.step("Открываем страницу авторизации"):
+        driver.get("https://www.saucedemo.com/")  # URL адреса сайта
 
-    if True:
-        # Проверяем, что вход успешен (появился элемент профиля/личный кабинет)
+    with allure.step("Выполняем сценарий: логин, покупка товара"):
+        fill_login_form(driver, wait, login, password, firstname, lastname, postalcode)
+
+    with allure.step("Проверяем, что покупка завершена успешно"):
         wait.until(EC.visibility_of_element_located(COMPLETE_OUTPUT))
         assert True, "Успешная покупка"
-    else:
-        assert False, "Неудачная покупка"
